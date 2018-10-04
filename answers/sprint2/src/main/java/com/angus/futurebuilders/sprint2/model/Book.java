@@ -1,12 +1,26 @@
 package com.angus.futurebuilders.sprint2.model;
 
 import lombok.*;
+import org.hibernate.annotations.Generated;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import java.sql.Date;
 
 @AllArgsConstructor
 @NoArgsConstructor
 public class Book {
-    @Getter @Setter private long Id;
+
+    @Id
+    @GeneratedValue(strategy= GenerationType.AUTO)
+    @Getter @Setter private Long id;
     @Getter @Setter private String author;
     @Getter @Setter private String title;
-    @Getter @Setter private long releaseDate;
+    @Getter @Setter private Date releaseDate;
+
+    @Override
+    public String toString() {
+        return String.format("Book[id=%d, title='%s', author='%s', releaseDate=%s]",
+                id, title, author, releaseDate.toString());
+    }
 }

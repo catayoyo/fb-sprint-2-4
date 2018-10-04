@@ -3,8 +3,7 @@ package com.angus.futurebuilders.sprint2.controller;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
-import javax.swing.text.html.Option;
-import javax.websocket.server.PathParam;
+import java.util.Collections;
 import java.util.Optional;
 
 import com.angus.futurebuilders.sprint2.model.Book;
@@ -13,7 +12,7 @@ import com.angus.futurebuilders.sprint2.repository.BookRepository;
 
 /**
  * REST controller for Book objects
- * */
+ */
 @RestController
 @RequestMapping("/book")
 public class BookController {
@@ -21,12 +20,19 @@ public class BookController {
     @Autowired
     private BookRepository bookRepository;
 
-    @RequestMapping("/{id}")
-    public Book getBook(@PathVariable("id") Integer id) {
-        if (id != null) {
-            Optional<Book> book = bookRepository.findById(id);
-            if (book.isPresent()) return book.get();
-        }
+    @RequestMapping("")
+    public Iterable<Book> getAllBooks() {
+        return bookRepository.findAll();
+    }
+
+    @RequestMapping("/find")
+    public Iterable<Book> find(@RequestParam("id") Optional<Integer> id,
+                               @RequestParam("title") Optional<String> title) {
+        if (id.isPresent())
+            if (bookRepository.existsById(id.get()))
+                return Collections.singleton(bookRepository.findById(id.get()).get());
+        if (title.isPresent())
+            return bookRepository.findByTitle(title.get());
         return null;
     }
 
@@ -36,16 +42,30 @@ public class BookController {
         return bookRepository.save(book);
     }
 
+    @RequestMapping("/update")
+    @PostMapping
+    public Book updateBook(@RequestBody Book book) {
+        return bookRepository.save(book);
+    }
+
     @RequestMapping("/delete/{id}")
-    public void deleteBookById(@PathVariable("id") Integer id) {
+    public boolean deleteBookById(@PathVariable("id") Integer id) {
         if (id != null) {
-            bookRepository.deleteById(id);
+            if (bookRepository.existsById(id)) {
+                bookRepository.deleteById(id);
+                return true;
+            }
         }
+        return false;
     }
 
     @RequestMapping("/delete")
-    @PostMapping
-    public void deleteBook(@RequestBody Book book) {
-        bookRepository.delete(book);
+    @DeleteMapping
+    public boolean deleteBook(@RequestBody Book book) {
+        if (bookRepository.existsById(book.getId())) {
+            bookRepository.delete(book);
+            return true;
+        }
+        return false;
     }
 }

@@ -45,7 +45,9 @@ public class BookController {
     @RequestMapping("/update")
     @PostMapping
     public Book updateBook(@RequestBody Book book) {
-        return bookRepository.save(book);
+        if (book.getId() != null && bookRepository.existsById(book.getId()))    // don't save unknown books
+            return bookRepository.save(book);
+        else return null;
     }
 
     @RequestMapping("/delete/{id}")

@@ -35,4 +35,17 @@ public class BookController {
     public Book createBook(@RequestBody Book book) {
         return bookRepository.save(book);
     }
+
+    @RequestMapping("/delete/{id}")
+    public void deleteBookById(@PathVariable("id") Integer id) {
+        if (id != null) {
+            bookRepository.deleteById(id);
+        }
+    }
+
+    @RequestMapping("/delete")
+    @PostMapping
+    public void deleteBook(@RequestBody Book book) {
+        bookRepository.delete(book);
+    }
 }
